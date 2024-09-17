@@ -6,6 +6,8 @@ import {
   useReducer,
 } from "react";
 
+import eachCities from "../components/CitiesData";
+
 const BASE_URL = "http://localhost:8000";
 
 const CityContext = createContext();
@@ -59,20 +61,7 @@ function CitiesProvider({ children }) {
   );
 
   useEffect(function () {
-    async function fetchCities() {
-      dispatch({ type: "loading" });
-      try {
-        const res = await fetch(`${BASE_URL}/cities`);
-        const data = await res.json();
-        dispatch({ type: "cities/loading", payload: data });
-      } catch {
-        dispatch({
-          type: "error",
-          payload: "There is an error loading the cities please try again...",
-        });
-      }
-    }
-    fetchCities();
+    dispatch({ type: "cities/loading", payload: eachCities });
   }, []);
 
   const getCity = useCallback(
