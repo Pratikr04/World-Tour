@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   MapContainer,
   TileLayer,
@@ -16,7 +16,8 @@ import { useURLPosition } from "../hooks/useURL";
 
 function Map() {
   const { cities } = useCities();
-  const [mapPosition, setMapPosition] = useState([40, 0]);
+  const [mapPosition, setMapPosition] = useState([28.6139, 77.209]); // New Delhi, India
+
   const [mapLat, mapLng] = useURLPosition();
   const {
     isLoading: isLoadingPosition,
@@ -33,7 +34,6 @@ function Map() {
     [mapLat, mapLng]
   );
 
-  
   useEffect(
     function () {
       if (geoLoactionPosition)
