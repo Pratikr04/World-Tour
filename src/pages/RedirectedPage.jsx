@@ -5,6 +5,7 @@ import { useEffect } from "react";
 function RedirectedPage({ children }) {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  console.log(isAuthenticated);
 
   useEffect(
     function () {
@@ -12,9 +13,8 @@ function RedirectedPage({ children }) {
     },
     [isAuthenticated, navigate]
   );
- 
 
-  return isAuthenticated && children ;
+  return isAuthenticated && children;
 }
 
 export default RedirectedPage;

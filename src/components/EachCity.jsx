@@ -13,7 +13,7 @@ function EachCity({ city }) {
   const { currentCity, deleteCity } = useCities();
   const { cityName, emoji, date, id, position } = city;
 
- 
+  
 
   function handleDelete(e) {
     e.preventDefault();

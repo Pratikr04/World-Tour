@@ -4,6 +4,7 @@ import { useCities } from "../Contexts/CityContexts";
 import { useEffect } from "react";
 import Spinner from "./Spinner";
 import BackButton from "./BackButton";
+
 const formatDate = (date) => {
   return new Intl.DateTimeFormat("en", {
     day: "numeric",
@@ -12,6 +13,7 @@ const formatDate = (date) => {
     weekday: "long",
   }).format(new Date(date));
 };
+
 function City() {
   const { id } = useParams();
 
@@ -21,7 +23,7 @@ function City() {
     function () {
       getCity(id);
     },
-    [id]
+    [id, getCity]
   );
   const { cityName, emoji, date, notes } = currentCity;
   if (isLoading) return <Spinner />;

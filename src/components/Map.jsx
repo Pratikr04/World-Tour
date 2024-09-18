@@ -16,7 +16,7 @@ import { useURLPosition } from "../hooks/useURL";
 
 function Map() {
   const { cities } = useCities();
-  const [mapPosition, setMapPosition] = useState([28.6139, 77.209]); // New Delhi, India
+  const [mapPosition, setMapPosition] = useState([28.6139, 77.209]); 
 
   const [mapLat, mapLng] = useURLPosition();
   const {

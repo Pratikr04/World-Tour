@@ -11,7 +11,7 @@ function CountryList() {
 
   if (!cities.length)
     return (
-      <Message message="Add youe first Country by clicking on the map!!" />
+      <Message message="Add your first Country by clicking on the map!!" />
     );
 
   const countries = cities.reduce((arr, city) => {

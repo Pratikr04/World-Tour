@@ -8,16 +8,15 @@ import {
 
 import eachCities from "../components/CitiesData";
 
-const BASE_URL = "http://localhost:8000";
-
 const CityContext = createContext();
 
 const initialValue = {
-  cities: [],
+  cities: JSON.parse(localStorage.getItem("cities")) || eachCities, 
   isLoading: false,
   currentCity: {},
   error: "",
 };
+
 function reducer(state, action) {
   switch (action.type) {
     case "loading":
@@ -33,24 +32,35 @@ function reducer(state, action) {
     case "currentCity/loading":
       return { ...state, isLoading: false, currentCity: action.payload };
 
-    case "city/created":
+    case "city/created": {
+      const updatedCities = [...state.cities, action.payload];
+      localStorage.setItem("cities", JSON.stringify(updatedCities)); // Save to local storage
       return {
         ...state,
-        cities: [...state.cities, action.payload],
+        cities: updatedCities,
         isLoading: false,
         currentCity: action.payload,
       };
+    }
 
-    case "city/delete":
+    case "city/delete": {
+      const filteredCities = state.cities.filter(
+        (city) => city.id !== action.payload
+      );
+      localStorage.setItem("cities", JSON.stringify(filteredCities)); // Save to local storage
       return {
         ...state,
-        cities: state.cities.filter((city) => city.id !== action.payload),
+        cities: filteredCities,
         isLoading: false,
         currentCity: {},
       };
+    }
 
     case "error":
       return { ...state, error: action.payload, isLoading: false };
+
+    default:
+      return state;
   }
 }
 
@@ -60,63 +70,47 @@ function CitiesProvider({ children }) {
     initialValue
   );
 
-  useEffect(function () {
-    dispatch({ type: "cities/loading", payload: eachCities });
+  // Load cities from local storage on app load
+  useEffect(() => {
+    const savedCities = JSON.parse(localStorage.getItem("cities"));
+    if (savedCities) {
+      dispatch({ type: "cities/loading", payload: savedCities });
+    }
   }, []);
 
   const getCity = useCallback(
-    async function getCity(id) {
+    function getCity(id) {
       if (Number(id) === currentCity.id) return;
-      dispatch({ type: "loading" });
-      try {
-        const res = await fetch(`${BASE_URL}/cities/${id}`);
-        const data = await res.json();
-        dispatch({ type: "currentCity/loading", payload: data });
-      } catch {
+
+      const city = cities.find((city) => city.id === Number(id));
+
+      if (city) {
+        dispatch({ type: "currentCity/loading", payload: city });
+      } else {
         dispatch({
           type: "error",
-          payload:
-            "There is an error loading the current City please try again...",
+          payload: "City not found in the list",
         });
       }
     },
-    [currentCity.id]
+    [currentCity.id, cities]
   );
 
-  async function createCity(newCity) {
+  function createCity(newCity) {
     dispatch({ type: "loading" });
-    try {
-      const res = await fetch(`${BASE_URL}/cities`, {
-        method: "POST",
-        body: JSON.stringify(newCity),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      dispatch({ type: "city/created", payload: data });
-    } catch {
-      dispatch({
-        type: "error",
-        payload: "There is an error creating the please try again...",
-      });
-    }
+    const newId =
+      cities.length > 0 ? Math.max(...cities.map((city) => city.id)) + 1 : 1;
+    const cityWithId = {
+      ...newCity,
+      id: newId,
+    };
+
+    dispatch({ type: "city/created", payload: cityWithId });
   }
 
-  async function deleteCity(id) {
+  function deleteCity(id) {
     dispatch({ type: "loading" });
-    try {
-      await fetch(`${BASE_URL}/cities/${id}`, {
-        method: "DELETE",
-      });
-
-      dispatch({ type: "city/delete", payload: id });
-    } catch {
-      dispatch({
-        type: "error",
-        payload: "There is an error deleting the city please try again...",
-      });
-    }
+    dispatch({ type: "city/delete", payload: id });
   }
 
   return (
